@@ -7,23 +7,34 @@ using static TorchSharp.torch.nn;
 
 namespace AlphanumericCharacterRecognition.Training;
 
+/// <summary>
+/// Trains the character recognition model on EMNIST samples.
+/// </summary>
 public class Trainer
 {
     private readonly CharacterRecognitionCNN model;
     private readonly EmnistDataset dataset;
 
+    /// <summary>
+    /// Prepares the model and training dataset for the training loop.
+    /// </summary>
     public Trainer(CharacterRecognitionCNN model, EmnistDataset dataset)
     {
         this.model = model;
         this.dataset = dataset;
     }
 
+    /// <summary>
+    /// Trains the model in mini-batches while tracking loss and accuracy.
+    /// </summary>
     public void Train( int epochs = 1, int batchSize = 64, int? maxSamples = null)
     {
         model.train();
 
+        // Adam adaptively updates the CNN weights from mini-batch gradients.
         using var optimizer = torch.optim.Adam( model.parameters(), lr: 0.001);
 
+        // CrossEntropyLoss expects raw logits [N, classes] and Int64 labels [N].
         using var lossFunction = CrossEntropyLoss();
 
         int sampleCount = maxSamples.HasValue ? Math.Min(maxSamples.Value, dataset.Count) : dataset.Count;
@@ -32,6 +43,7 @@ public class Trainer
 
         for (int epoch = 1; epoch <= epochs; epoch++)
         {
+            // Shuffle each epoch to avoid learning from a fixed sample order.
             Shuffle(indices);
 
             double totalLoss = 0;
@@ -56,22 +68,29 @@ public class Trainer
                     labelValues[i] = sample.Label;
                 }
 
+                // Stack samples into the batch shape consumed by Conv2d: [N, 3, 32, 32].
                 using var inputBatch = torch.stack(imageList.ToArray());
 
+                // Class labels stay as a 1D Int64 tensor for CrossEntropyLoss.
                 using var labelBatch = torch.tensor(labelValues, dtype: ScalarType.Int64);
 
+                // Gradients accumulate by default, so clear them before this batch.
                 optimizer.zero_grad();
 
+                // Forward pass produces one logit vector per image.
                 using var predictions = model.forward(inputBatch);
 
                 using var loss = lossFunction.call(predictions, labelBatch);
 
+                // Backpropagation fills parameter gradients from the loss.
                 loss.backward();
 
+                // Apply Adam's parameter update using the gradients just computed.
                 optimizer.step();
 
                 totalLoss += loss.item<float>();
 
+                // The largest logit along the class dimension is the predicted label.
                 using var predictedLabels = predictions.argmax(1);
 
                 using var correctTensor = predictedLabels.eq(labelBatch).sum();
@@ -103,6 +122,9 @@ public class Trainer
         }
     }
 
+    /// <summary>
+    /// Randomizes sample indices before an epoch.
+    /// </summary>
     private static void Shuffle(int[] array)
     {
         for (int i = array.Length - 1; i > 0; i--)

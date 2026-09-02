@@ -1,7 +1,13 @@
 namespace AlphanumericCharacterRecognition.Data;
 
+/// <summary>
+/// Loads the mapping between EMNIST labels and characters.
+/// </summary>
 public static class CharacterMapping
 {
+    /// <summary>
+    /// Converts a mapping file into a label-to-character dictionary.
+    /// </summary>
     public static Dictionary<int, char> Load(string filePath)
     {
         var mapping = new Dictionary<int, char>();

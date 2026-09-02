@@ -7,21 +7,32 @@ using static TorchSharp.torch.nn;
 
 namespace AlphanumericCharacterRecognition.Evaluation;
 
+/// <summary>
+/// Evaluates a trained model on an EMNIST dataset.
+/// </summary>
 public class Evaluator
 {
     private readonly CharacterRecognitionCNN model;
     private readonly EmnistDataset dataset;
 
+    /// <summary>
+    /// Prepares the model and dataset for evaluation.
+    /// </summary>
     public Evaluator( CharacterRecognitionCNN model, EmnistDataset dataset)
     {
         this.model = model;
         this.dataset = dataset;
     }
 
+    /// <summary>
+    /// Computes loss and accuracy on the selected samples.
+    /// </summary>
     public void Evaluate(int batchSize = 64,int? maxSamples = null)
     {
+        // Evaluation mode selects inference behavior for layers that need it.
         model.eval();
 
+        // Keep the same objective as training so loss values are comparable.
         using var lossFunction = CrossEntropyLoss();
 
         int sampleCount = maxSamples.HasValue ? Math.Min(maxSamples.Value, dataset.Count) : dataset.Count;
@@ -46,14 +57,18 @@ public class Evaluator
                 labels[i] = sample.Label;
             }
 
+            // Match the training batch shape: [N, 3, 32, 32].
             using var inputBatch = torch.stack(images.ToArray());
 
+            // Int64 class indices are the target format for CrossEntropyLoss.
             using var labelBatch = torch.tensor(labels, dtype: ScalarType.Int64);
 
+            // Evaluation runs forward only; no backward pass or optimizer step follows.
             using var predictions = model.forward(inputBatch);
 
             using var loss = lossFunction.call(predictions, labelBatch);
 
+            // Accuracy uses the class with the highest logit for each image.
             using var predictedLabels = predictions.argmax(1);
 
             using var correctTensor = predictedLabels.eq(labelBatch).sum();

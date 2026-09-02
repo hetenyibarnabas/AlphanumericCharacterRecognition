@@ -3,6 +3,9 @@ using static TorchSharp.torch;
 
 namespace AlphanumericCharacterRecognition.Data;
 
+/// <summary>
+/// Provides EMNIST images and labels as TorchSharp training samples.
+/// </summary>
 public class EmnistDataset
 {
     private readonly byte[][] images;
@@ -10,6 +13,9 @@ public class EmnistDataset
 
     public int Count => images.Length;
 
+    /// <summary>
+    /// Reads IDX image and label files, then validates that they match.
+    /// </summary>
     public EmnistDataset(string imagePath, string labelPath)
     {
         images = IdxReader.ReadImages(imagePath);
@@ -23,6 +29,9 @@ public class EmnistDataset
         }
     }
 
+    /// <summary>
+    /// Returns the preprocessed image tensor and label at the given index.
+    /// </summary>
     public (Tensor Image, long Label) GetItem(int index)
     {
         if (index < 0 || index >= Count)
@@ -36,16 +45,17 @@ public class EmnistDataset
         const int targetSize = 32;
         const int padding = 2;
 
+        // The model expects three 32x32 channels, so pad EMNIST's 28x28 glyphs.
         float[] rgb = new float[3 * targetSize * targetSize];
 
         for (int y = 0; y < sourceSize; y++)
         {
             for (int x = 0; x < sourceSize; x++)
             {
-                // EMNIST orientation correction: transpose
+                // This swaps row/column to correct EMNIST's stored orientation.
                 byte pixel = source[x * sourceSize + y];
 
-                // Normalize from 0..255 to 0..1
+                // Scale byte pixels to the 0..1 float range used by the network.
                 float value = pixel / 255.0f;
 
                 int targetX = x + padding;
@@ -53,17 +63,14 @@ public class EmnistDataset
 
                 int pixelIndex = targetY * targetSize + targetX;
 
-                // R
+                // Duplicate grayscale intensity across RGB channels for Conv2d(3, ...).
                 rgb[pixelIndex] = value;
-
-                // G
                 rgb[targetSize * targetSize + pixelIndex] = value;
-
-                // B
                 rgb[2 * targetSize * targetSize + pixelIndex] = value;
             }
         }
 
+        // TorchSharp uses channel-first image tensors: [channels, height, width].
         Tensor imageTensor = tensor(rgb)
             .reshape(3, targetSize, targetSize);
 

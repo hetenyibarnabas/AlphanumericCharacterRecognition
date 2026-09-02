@@ -2,14 +2,21 @@ using System.Buffers.Binary;
 
 namespace AlphanumericCharacterRecognition.Data;
 
+/// <summary>
+/// Reads EMNIST image and label files stored in IDX format.
+/// </summary>
 public static class IdxReader
 {
+    /// <summary>
+    /// Reads an IDX image file as raw flattened pixel data.
+    /// </summary>
     public static byte[][] ReadImages(string filePath)
     {
         using var stream = File.OpenRead(filePath);
         using var reader = new BinaryReader(stream);
 
-        int magicNumber = ReadInt32BigEndian(reader);   //Check value at the beggining of the file.
+        // IDX headers store metadata as big-endian 32-bit integers.
+        int magicNumber = ReadInt32BigEndian(reader);
         int imageCount = ReadInt32BigEndian(reader);
         int rows = ReadInt32BigEndian(reader);
         int columns = ReadInt32BigEndian(reader);
@@ -23,7 +30,8 @@ public static class IdxReader
 
         int pixelsPerImage = rows * columns;
 
-        var images = new byte[imageCount][];        //This needs to be optimized, to not load all images into memory at once.
+        // Keep raw flattened images until GetItem applies ML preprocessing.
+        var images = new byte[imageCount][];
 
         for (int i = 0; i < imageCount; i++)
         {
@@ -40,11 +48,15 @@ public static class IdxReader
         return images;
     }
 
+    /// <summary>
+    /// Reads an IDX label file as an array of class IDs.
+    /// </summary>
     public static byte[] ReadLabels(string filePath)
     {
         using var stream = File.OpenRead(filePath);
         using var reader = new BinaryReader(stream);
 
+        // IDX labels use the same big-endian integer header format as images.
         int magicNumber = ReadInt32BigEndian(reader);
         int labelCount = ReadInt32BigEndian(reader);
 
@@ -55,6 +67,7 @@ public static class IdxReader
             );
         }
 
+        // Labels remain class indices; CrossEntropyLoss does not need one-hot targets.
         byte[] labels = reader.ReadBytes(labelCount);
 
         if (labels.Length != labelCount)
@@ -67,6 +80,9 @@ public static class IdxReader
         return labels;
     }
 
+    /// <summary>
+    /// Converts four bytes into an IDX-compatible big-endian integer.
+    /// </summary>
     private static int ReadInt32BigEndian(BinaryReader reader)
     {
         byte[] bytes = reader.ReadBytes(4);
@@ -76,6 +92,7 @@ public static class IdxReader
             throw new EndOfStreamException();
         }
 
+        // BinaryReader follows platform endianness, but IDX files are always big-endian.
         return BinaryPrimitives.ReadInt32BigEndian(bytes);
     }
 }
