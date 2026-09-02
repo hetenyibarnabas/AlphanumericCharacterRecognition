@@ -13,12 +13,12 @@ namespace AlphanumericCharacterRecognition.Training;
 public class Trainer
 {
     private readonly CharacterRecognitionCNN model;
-    private readonly EmnistDataset dataset;
+    private readonly ICharacterDataset dataset;
 
     /// <summary>
     /// Prepares the model and training dataset for the training loop.
     /// </summary>
-    public Trainer(CharacterRecognitionCNN model, EmnistDataset dataset)
+    public Trainer(CharacterRecognitionCNN model, ICharacterDataset dataset)
     {
         this.model = model;
         this.dataset = dataset;

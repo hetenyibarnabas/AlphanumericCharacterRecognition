@@ -6,7 +6,7 @@ namespace AlphanumericCharacterRecognition.Data;
 /// <summary>
 /// Provides EMNIST images and labels as TorchSharp training samples.
 /// </summary>
-public class EmnistDataset
+public class EmnistDataset: ICharacterDataset
 {
     private readonly byte[][] images;
     private readonly byte[] labels;
@@ -77,5 +77,16 @@ public class EmnistDataset
         long label = labels[index];
 
         return (imageTensor, label);
+    }
+
+    /// <summary>
+    /// Returns only the class label for split construction.
+    /// </summary>
+    public long GetLabel(int index)
+    {
+        if (index < 0 || index >= Count)
+            throw new ArgumentOutOfRangeException(nameof(index));
+
+        return labels[index];
     }
 }
