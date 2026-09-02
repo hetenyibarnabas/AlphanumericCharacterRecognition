@@ -13,12 +13,12 @@ namespace AlphanumericCharacterRecognition.Evaluation;
 public class Evaluator
 {
     private readonly CharacterRecognitionCNN model;
-    private readonly EmnistDataset dataset;
+    private readonly ICharacterDataset dataset;
 
     /// <summary>
     /// Prepares the model and dataset for evaluation.
     /// </summary>
-    public Evaluator( CharacterRecognitionCNN model, EmnistDataset dataset)
+    public Evaluator( CharacterRecognitionCNN model, ICharacterDataset dataset)
     {
         this.model = model;
         this.dataset = dataset;
