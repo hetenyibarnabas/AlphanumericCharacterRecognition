@@ -1,12 +1,12 @@
 ﻿using TorchSharp;
+using AlphanumericCharacterRecognition.Model;
+using static TorchSharp.torch;
 
-var tensor = torch.tensor(new float[]
-{
-    1, 2, 3,
-    4, 5, 6
-});
+using var model = new CharacterRecognitionCNN();
 
-tensor = tensor.reshape(2, 3);
+using var testImage = randn(1, 3, 32, 32);
 
-Console.WriteLine("TorchSharp works!");
-Console.WriteLine(tensor[0, 0].item<float>());
+using var output = model.forward(testImage);
+
+Console.WriteLine($"Input shape: [{string.Join(", ", testImage.shape)}]");
+Console.WriteLine($"Output shape: [{string.Join(", ", output.shape)}]");
