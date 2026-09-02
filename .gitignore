@@ -12,3 +12,7 @@ data/
 models/*.dat
 models/*.pt
 models/*.pth
+
+# Local AI / agent config
+.agents/
+.codex/
