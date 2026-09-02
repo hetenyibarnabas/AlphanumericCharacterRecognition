@@ -1,12 +1,31 @@
-﻿using TorchSharp;
+﻿using AlphanumericCharacterRecognition.Data;
 using AlphanumericCharacterRecognition.Model;
-using static TorchSharp.torch;
+using AlphanumericCharacterRecognition.Training;
+using AlphanumericCharacterRecognition.Evaluation;
+
+var trainDataset = new EmnistDataset(
+    "Data/emnist/emnist-byclass-train-images-idx3-ubyte",
+    "Data/emnist/emnist-byclass-train-labels-idx1-ubyte"
+);
+
+var testDataset = new EmnistDataset(
+    "Data/emnist/emnist-byclass-test-images-idx3-ubyte",
+    "Data/emnist/emnist-byclass-test-labels-idx1-ubyte"
+);
 
 using var model = new CharacterRecognitionCNN();
 
-using var testImage = randn(1, 3, 32, 32);
+var trainer = new Trainer(model, trainDataset);
 
-using var output = model.forward(testImage);
+trainer.Train(
+    epochs: 1,
+    batchSize: 64,
+    maxSamples: 10000
+);
 
-Console.WriteLine($"Input shape: [{string.Join(", ", testImage.shape)}]");
-Console.WriteLine($"Output shape: [{string.Join(", ", output.shape)}]");
+var evaluator = new Evaluator(model, testDataset);
+
+evaluator.Evaluate(
+    batchSize: 64,
+    maxSamples: 5000
+);
