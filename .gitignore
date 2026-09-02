@@ -1,0 +1,14 @@
+# .NET build files
+bin/
+obj/
+
+# VS Code
+.vscode/
+
+# Training datasets
+data/
+
+# Trained models
+models/*.dat
+models/*.pt
+models/*.pth
