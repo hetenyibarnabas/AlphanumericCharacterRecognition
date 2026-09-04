@@ -208,7 +208,7 @@ void TrainCombined()
 
     var trainer = new Trainer( model, combinedTrain);
 
-    trainer.Train( epochs: 3, batchSize: 64, maxSamples: null );
+    trainer.Train( epochs: 7, batchSize: 64, maxSamples: null );
 
     Directory.CreateDirectory("models");
 
@@ -245,7 +245,7 @@ void EvaluateCombined()
 
     var emnistEvaluator = new Evaluator(model, emnistTest);
 
-    emnistEvaluator.Evaluate(batchSize: 64, maxSamples: 5000);
+    emnistEvaluator.Evaluate(batchSize: 64, maxSamples: null);
 
     var chars74k = new Chars74kDataset(
         "data/chars74k/English/Img/GoodImg/Bmp"
