@@ -15,9 +15,7 @@ public class DatasetSubset : ICharacterDataset
     /// <summary>
     /// Stores the source dataset and the indices included in this subset.
     /// </summary>
-    public DatasetSubset(
-        ICharacterDataset source,
-        IEnumerable<int> indices)
+    public DatasetSubset( ICharacterDataset source, IEnumerable<int> indices)
     {
         this.source = source;
         this.indices = indices.ToArray();
@@ -28,8 +26,7 @@ public class DatasetSubset : ICharacterDataset
     /// </summary>
     public (Tensor Image, long Label) GetItem(int index)
     {
-        if (index < 0 || index >= Count)
-            throw new ArgumentOutOfRangeException(nameof(index));
+        if (index < 0 || index >= Count) throw new ArgumentOutOfRangeException(nameof(index));
 
         return source.GetItem(indices[index]);
     }
@@ -39,8 +36,7 @@ public class DatasetSubset : ICharacterDataset
     /// </summary>
     public long GetLabel(int index)
     {
-        if (index < 0 || index >= Count)
-            throw new ArgumentOutOfRangeException(nameof(index));
+        if (index < 0 || index >= Count) throw new ArgumentOutOfRangeException(nameof(index));
 
         return source.GetLabel(indices[index]);
     }

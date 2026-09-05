@@ -21,12 +21,7 @@ public static class IdxReader
         int rows = ReadInt32BigEndian(reader);
         int columns = ReadInt32BigEndian(reader);
 
-        if (magicNumber != 2051)
-        {
-            throw new InvalidDataException(
-                $"Invalid image IDX magic number: {magicNumber}"
-            );
-        }
+        if (magicNumber != 2051) throw new InvalidDataException($"Invalid image IDX magic number: {magicNumber}");
 
         int pixelsPerImage = rows * columns;
 
@@ -37,12 +32,7 @@ public static class IdxReader
         {
             images[i] = reader.ReadBytes(pixelsPerImage);
 
-            if (images[i].Length != pixelsPerImage)
-            {
-                throw new EndOfStreamException(
-                    $"Unexpected end of file while reading image {i}."
-                );
-            }
+            if (images[i].Length != pixelsPerImage) throw new EndOfStreamException("Unexpected end of file while reading image {i}.");
         }
 
         return images;
@@ -60,22 +50,12 @@ public static class IdxReader
         int magicNumber = ReadInt32BigEndian(reader);
         int labelCount = ReadInt32BigEndian(reader);
 
-        if (magicNumber != 2049)
-        {
-            throw new InvalidDataException(
-                $"Invalid label IDX magic number: {magicNumber}"
-            );
-        }
+        if (magicNumber != 2049) throw new InvalidDataException($"Invalid label IDX magic number: {magicNumber}");
 
         // Labels remain class indices; CrossEntropyLoss does not need one-hot targets.
         byte[] labels = reader.ReadBytes(labelCount);
 
-        if (labels.Length != labelCount)
-        {
-            throw new EndOfStreamException(
-                "Unexpected end of file while reading labels."
-            );
-        }
+        if (labels.Length != labelCount) throw new EndOfStreamException("Unexpected end of file while reading labels.");
 
         return labels;
     }
@@ -87,10 +67,7 @@ public static class IdxReader
     {
         byte[] bytes = reader.ReadBytes(4);
 
-        if (bytes.Length != 4)
-        {
-            throw new EndOfStreamException();
-        }
+        if (bytes.Length != 4) throw new EndOfStreamException();
 
         // BinaryReader follows platform endianness, but IDX files are always big-endian.
         return BinaryPrimitives.ReadInt32BigEndian(bytes);

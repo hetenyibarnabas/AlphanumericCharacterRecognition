@@ -5,9 +5,9 @@ using static TorchSharp.torch.nn;
 namespace AlphanumericCharacterRecognition.Model;
 
 /// <summary>
-/// Convolutional neural network for EMNIST character classification.
+/// Convolutional neural network for character classification.
 /// </summary>
-public class CharacterRecognitionCNN : Module<Tensor, Tensor>
+public class CharacterRecognitionCNN : Module<Tensor, Tensor>   //Tensor input and output.
 {
     private readonly Module<Tensor, Tensor> conv1;
     private readonly Module<Tensor, Tensor> conv2;

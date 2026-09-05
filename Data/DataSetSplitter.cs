@@ -52,9 +52,7 @@ public static class DatasetSplitter
     /// <summary>
     /// Randomizes indices with the provided seeded generator.
     /// </summary>
-    private static void Shuffle(
-        List<int> values,
-        Random random)
+    private static void Shuffle( List<int> values,  Random random)
     {
         for (int i = values.Count - 1; i > 0; i--)
         {

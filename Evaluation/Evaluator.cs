@@ -8,7 +8,7 @@ using static TorchSharp.torch.nn;
 namespace AlphanumericCharacterRecognition.Evaluation;
 
 /// <summary>
-/// Evaluates a trained model on an EMNIST dataset.
+/// Evaluates a trained model on a dataset.
 /// </summary>
 public class Evaluator
 {
@@ -42,14 +42,14 @@ public class Evaluator
         double totalLoss = 0;
         int batchCount = 0;
 
-        for (int start = 0; start < sampleCount; start += batchSize)
+        for (int start = 0; start < sampleCount; start += batchSize)    //Enumerate through the batches of the dataset
         {
             int currentBatchSize =  Math.Min(batchSize, sampleCount - start);
 
             var images = new List<Tensor>();
             var labels = new long[currentBatchSize];
 
-            for (int i = 0; i < currentBatchSize; i++)
+            for (int i = 0; i < currentBatchSize; i++)  //Enumerate through the samples in the current batch.
             {
                 var sample = dataset.GetItem(start + i);
 
@@ -86,11 +86,7 @@ public class Evaluator
 
         Console.WriteLine();
         Console.WriteLine("Evaluation results:");
-        Console.WriteLine(
-            $"Average loss: {totalLoss / batchCount:F4}"
-        );
-        Console.WriteLine(
-            $"Accuracy: {(double)correct / processed:P2}"
-        );
+        Console.WriteLine($"Average loss: {totalLoss / batchCount:F4}");
+        Console.WriteLine($"Accuracy: {(double)correct / processed:P2}");
     }
 }

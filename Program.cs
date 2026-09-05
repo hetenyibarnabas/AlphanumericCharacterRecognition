@@ -9,8 +9,8 @@ const string modelPath = "models/characterRecognition_cnn.dat";
 if (args.Length == 0)
 {
     Console.WriteLine("Usage:");
-    Console.WriteLine("  dotnet run -- train");
-    Console.WriteLine("  dotnet run -- evaluate");
+    Console.WriteLine("  dotnet run -- train-combined");
+    Console.WriteLine("  dotnet run -- evaluate-combined");
     return;
 }
 
@@ -91,7 +91,7 @@ void Evaluate()
 
     using var model = new CharacterRecognitionCNN();
 
-    model.load(modelPath);
+    model.load(modelPath);  // Load the saved weights.
 
     var evaluator = new Evaluator(model, testDataset);
 
@@ -105,7 +105,7 @@ void TrainChars74k()
         "data/chars74k/English/Img/GoodImg/Bmp"
     );
 
-    var (trainSet, _) = DatasetSplitter.StratifiedSplit( fullDataset, trainRatio: 0.8, seed: 42 );
+    var (trainSet, _) = DatasetSplitter.StratifiedSplit( fullDataset, trainRatio: 0.8, seed: 42 );  // Test set is thrown out.
 
     using var model = new CharacterRecognitionCNN();
 
@@ -135,7 +135,7 @@ void EvaluateChars74k()
         "data/chars74k/English/Img/GoodImg/Bmp"
     );
 
-    var (_, testSet) = DatasetSplitter.StratifiedSplit( fullDataset, trainRatio: 0.8, seed: 42 );
+    var (_, testSet) = DatasetSplitter.StratifiedSplit( fullDataset, trainRatio: 0.8, seed: 42 );   // Test set is thrown out.
 
     using var model = new CharacterRecognitionCNN();
 
@@ -172,13 +172,9 @@ void TestCombinedDataset()
     var firstSample = combined.GetItem(0);
     var lastSample = combined.GetItem(combined.Count - 1);
 
-    Console.WriteLine(
-        $"First shape: [{string.Join(", ", firstSample.Image.shape)}]"
-    );
+    Console.WriteLine($"First shape: [{string.Join(", ", firstSample.Image.shape)}]");  //string.Join(separator, collection))
 
-    Console.WriteLine(
-        $"Last shape: [{string.Join(", ", lastSample.Image.shape)}]"
-    );
+    Console.WriteLine($"Last shape: [{string.Join(", ", lastSample.Image.shape)}]");
 
     firstSample.Image.Dispose();
     lastSample.Image.Dispose();
@@ -240,8 +236,7 @@ void EvaluateCombined()
         "data/emnist/emnist-byclass-test-labels-idx1-ubyte"
     );
 
-    Console.WriteLine();
-    Console.WriteLine("EMNIST test:");
+    Console.WriteLine("\nEMNIST test:");
 
     var emnistEvaluator = new Evaluator(model, emnistTest);
 
@@ -253,8 +248,7 @@ void EvaluateCombined()
 
     var (_, charsTest) = DatasetSplitter.StratifiedSplit(chars74k, trainRatio: 0.8, seed: 42);
 
-    Console.WriteLine();
-    Console.WriteLine("Chars74K test:");
+    Console.WriteLine("\nChars74K test:");
 
     var charsEvaluator = new Evaluator(model, charsTest);
 

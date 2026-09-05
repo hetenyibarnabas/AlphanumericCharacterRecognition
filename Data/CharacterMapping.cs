@@ -14,13 +14,9 @@ public static class CharacterMapping
 
         foreach (string line in File.ReadLines(filePath))
         {
-            if (string.IsNullOrWhiteSpace(line))
-                continue;
+            if (string.IsNullOrWhiteSpace(line)) continue;
 
-            string[] parts = line.Split(
-                ' ',
-                StringSplitOptions.RemoveEmptyEntries
-            );
+            string[] parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
             int label = int.Parse(parts[0]);
             int characterCode = int.Parse(parts[1]);

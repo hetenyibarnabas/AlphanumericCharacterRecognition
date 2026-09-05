@@ -8,7 +8,7 @@ using static TorchSharp.torch.nn;
 namespace AlphanumericCharacterRecognition.Training;
 
 /// <summary>
-/// Trains the character recognition model on EMNIST samples.
+/// Trains the character recognition model.
 /// </summary>
 public class Trainer
 {
@@ -51,14 +51,14 @@ public class Trainer
             long processed = 0;
             int batchNumber = 0;
 
-            for (int start = 0; start < sampleCount; start += batchSize)
+            for (int start = 0; start < sampleCount; start += batchSize)    //Enumerate through the batches of the dataset
             {
                 int currentBatchSize = Math.Min(batchSize, sampleCount - start);
 
                 var imageList = new List<Tensor>();
                 var labelValues = new long[currentBatchSize];
 
-                for (int i = 0; i < currentBatchSize; i++)
+                for (int i = 0; i < currentBatchSize; i++)  //Enumerate through the samples in the current batch.
                 {
                     int datasetIndex = indices[start + i];
 
@@ -104,21 +104,14 @@ public class Trainer
 
                 if (batchNumber % 50 == 0)
                 {
-                    Console.WriteLine(
-                        $"Epoch {epoch} | " +
-                        $"{processed}/{sampleCount} | " +
-                        $"Loss: {loss.item<float>():F4} | " +
-                        $"Accuracy: {(double)correct / processed:P2}"
+                    Console.WriteLine($"Epoch {epoch} | " + $"{processed}/{sampleCount} | " + $"Loss: {loss.item<float>():F4} | "
+                                    + $"Accuracy: {(double)correct / processed:P2}"
                     );
                 }
             }
 
-            Console.WriteLine();
-            Console.WriteLine(
-                $"Epoch {epoch} finished | " +
-                $"Average loss: {totalLoss / batchNumber:F4} | " +
-                $"Accuracy: {(double)correct / processed:P2}"
-            );
+            Console.WriteLine($"\nEpoch {epoch} finished | " + $"Average loss: {totalLoss / batchNumber:F4} | " 
+                                + $"Accuracy: {(double)correct / processed:P2}" );
         }
     }
 
@@ -131,7 +124,7 @@ public class Trainer
         {
             int j = Random.Shared.Next(i + 1);
 
-            (array[i], array[j]) =  (array[j], array[i]);
+            (array[i], array[j]) =  (array[j], array[i]);   // Swapping elements.
         }
     }
 }

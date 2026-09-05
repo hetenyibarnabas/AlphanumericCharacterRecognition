@@ -35,12 +35,7 @@ public class Chars74kDataset : ICharacterDataset
             }
         }
 
-        if (samples.Count == 0)
-        {
-            throw new InvalidDataException(
-                $"No Chars74K images found in: {rootPath}"
-            );
-        }
+        if (samples.Count == 0) throw new InvalidDataException($"No Chars74K images found in: {rootPath}");
     }
 
     /// <summary>
@@ -48,19 +43,13 @@ public class Chars74kDataset : ICharacterDataset
     /// </summary>
    public (Tensor Image, long Label) GetItem(int index)
     {
-        if (index < 0 || index >= Count)
-            throw new ArgumentOutOfRangeException(nameof(index));
+        if (index < 0 || index >= Count) throw new ArgumentOutOfRangeException(nameof(index));
 
         var sample = samples[index];
 
         using var original = SKBitmap.Decode(sample.Path);
 
-        if (original == null)
-        {
-            throw new InvalidDataException(
-                $"Could not load image: {sample.Path}"
-            );
-        }
+        if (original == null) throw new InvalidDataException($"Could not load image: {sample.Path}");
 
         const int sourceSize = 28;
         const int targetSize = 32;
@@ -78,8 +67,7 @@ public class Chars74kDataset : ICharacterDataset
             canvas.DrawBitmap(original,new SKRect(0, 0, sourceSize, sourceSize),sampling);
         }
 
-        float[] rgb =
-            new float[3 * targetSize * targetSize];
+        float[] rgb = new float[3 * targetSize * targetSize];
 
         for (int y = 0; y < sourceSize; y++)
         {
@@ -90,24 +78,19 @@ public class Chars74kDataset : ICharacterDataset
                 int targetX = x + padding;
                 int targetY = y + padding;
 
-                int pixelIndex =
-                    targetY * targetSize + targetX;
+                int pixelIndex = targetY * targetSize + targetX;
 
                 // Preserve RGB channels and scale byte values to 0..1.
-                rgb[pixelIndex] =
-                    pixel.Red / 255.0f;
+                rgb[pixelIndex] = pixel.Red / 255.0f;
 
-                rgb[targetSize * targetSize + pixelIndex] =
-                    pixel.Green / 255.0f;
+                rgb[targetSize * targetSize + pixelIndex] = pixel.Green / 255.0f;
 
-                rgb[2 * targetSize * targetSize + pixelIndex] =
-                    pixel.Blue / 255.0f;
+                rgb[2 * targetSize * targetSize + pixelIndex] = pixel.Blue / 255.0f;
             }
         }
 
         // Keep the same channel-first shape used by EMNIST samples: [3, 32, 32].
-        Tensor tensorImage =
-            tensor(rgb).reshape(3, 32, 32);
+        Tensor tensorImage = tensor(rgb).reshape(3, 32, 32);
 
         return (tensorImage, sample.Label);
     }
@@ -118,8 +101,7 @@ public class Chars74kDataset : ICharacterDataset
     /// </summary>
     public long GetLabel(int index)
     {
-        if (index < 0 || index >= Count)
-            throw new ArgumentOutOfRangeException(nameof(index));
+        if (index < 0 || index >= Count) throw new ArgumentOutOfRangeException(nameof(index));
 
         return samples[index].Label;
     }
